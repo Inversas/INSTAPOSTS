@@ -10,8 +10,19 @@ jQuery(document).ready(function($) {
     let isDragging = false;
     // Variable para almacenar el índice actual de la imagen
     let currentIndex = 0;
+    // Variable para almacenar el video actual
+    let currentVideo = null;
 
-    
+    // Función para reproducir video
+    function playVideo(videoElement) {
+        videoElement.play();
+    }
+
+    // Función para detener video
+    function stopVideo(videoElement) {
+        videoElement.pause();
+        videoElement.currentTime = 0; // Reiniciar el video
+    }
 
     // Configurar el evento dragstart para detectar cuando se empieza a arrastrar un elemento
     $(document).on('dragstart', function() {
@@ -116,6 +127,19 @@ jQuery(document).ready(function($) {
             } else {
                 $popup.find('.nav-btn.next').show();
             }
+
+            // Detener el video anterior si es necesario
+            if (currentVideo) {
+                stopVideo(currentVideo);
+                currentVideo = null;
+            }
+
+            // Reproducir el nuevo video si es necesario
+            const newMediaElement = $popup.find('.popup-content').eq(index).find('video')[0];
+            if (newMediaElement) {
+                playVideo(newMediaElement);
+                currentVideo = newMediaElement;
+            }
         }
 
         // Función para actualizar los botones de navegación entre posts
@@ -149,7 +173,7 @@ jQuery(document).ready(function($) {
                                     ${media.map(url => {
                                         const isVideo = url.match(/\.(mp4|webm)$/);
                                         return `<div class="swiper-slide">
-                                                    ${isVideo ? `<video src="${url}" alt="media" style="max-width:100%;" class="media-preview" autoplay loop muted></video>`
+                                                    ${isVideo ? `<video src="${url}" alt="media" style="max-width:100%;" class="media-preview" autoplay loop></video>`
                                                               : `<img src="${url}" alt="media" style="max-width:100%;" class="media-preview" />`}
                                                 </div>`;
                                     }).join('')}
@@ -182,6 +206,11 @@ jQuery(document).ready(function($) {
                     $popup.hide();
                     $popupContainer.hide();
                     isPopupVisible = false;
+                    // Detener el video actual si es necesario
+                    if (currentVideo) {
+                        stopVideo(currentVideo);
+                        currentVideo = null;
+                    }
                 });
 
                 // Configurar eventos de arrastre y clic para los slides
@@ -205,7 +234,7 @@ jQuery(document).ready(function($) {
                     const isVideo = url.match(/\.(mp4|webm)$/);
                     let mediaElement;
                     if (isVideo) {
-                        mediaElement = $('<div class="popup-content"><video src="'+url+'" style="max-width:100%;" class="media-preview" autoplay loop muted></video></div>');
+                        mediaElement = $('<div class="popup-content"><video src="'+url+'" style="max-width:100%;" class="media-preview" autoplay loop></video></div>');
                     } else {
                         mediaElement = $('<div class="popup-content"><img src="'+url+'" style="max-width:100%;" class="media-preview" /></div>');
                     }
@@ -231,6 +260,11 @@ jQuery(document).ready(function($) {
                     $popup.hide();
                     $popupContainer.hide();
                     isPopupVisible = false;
+                    // Detener el video actual si es necesario
+                    if (currentVideo) {
+                        stopVideo(currentVideo);
+                        currentVideo = null;
+                    }
                 });
 
                 // Configurar el evento click para el botón de navegación anterior
@@ -296,6 +330,11 @@ jQuery(document).ready(function($) {
                 $popupContainer.hide();
                 isPopupVisible = false;
                 isDragging = false;
+                // Detener el video actual si es necesario
+                if (currentVideo) {
+                    stopVideo(currentVideo);
+                    currentVideo = null;
+                }
             }
         });
 
