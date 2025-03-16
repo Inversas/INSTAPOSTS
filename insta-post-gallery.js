@@ -11,44 +11,6 @@ jQuery(document).ready(function($) {
     // Variable para almacenar el índice actual de la imagen
     let currentIndex = 0;
 
-    // Configurar el Media Uploader
-    $('.select-media-button').on('click', function(e) {
-        // Prevenir el comportamiento predeterminado del botón
-        e.preventDefault();
-        // Obtener el botón en el que se hizo clic
-        var button = $(this);
-        // Obtener el campo de entrada objetivo asociado con el botón
-        var target = $(button.data('target'));
-
-        // Configurar el frame del Media Uploader
-        var frame = wp.media({
-           title: 'Select or Upload Media',
-           button: {
-               text: 'Use this media'
-           },
-           multiple: false
-       });
-
-       // Manejar el evento de selección de medios
-       frame.on('select', function() {
-           // Obtener el archivo seleccionado
-           var attachment = frame.state().get('selection').first().toJSON();
-           // Asignar la URL del archivo seleccionado al campo de entrada objetivo
-           target.val(attachment.url);
-           // Eliminar la vista previa existente si la hay
-           button.siblings('img, video').remove();
-           // Añadir una nueva vista previa dependiendo del tipo de archivo
-           if (attachment.type === 'image') {
-               button.after('<br><img src="'+attachment.url+'" style="max-width:100px;" class="media-preview" />'); // Añadir vista previa de imagen
-           } else if (attachment.type === 'video') {
-               button.after('<br><video src="'+attachment.url+'" style="max-width:100px;" class="media-preview" autoplay loop muted></video>'); // Añadir vista previa de video
-           }
-       });
-
-       // Abrir el frame del Media Uploader
-       frame.open();
-   });
-
     // Configurar el evento dragstart para detectar cuando se empieza a arrastrar un elemento
     $(document).on('dragstart', function() {
         isDragging = true;
@@ -280,64 +242,19 @@ jQuery(document).ready(function($) {
                     currentIndex = (currentIndex < media.length - 1) ? currentIndex + 1 : 0;
                     showMedia(currentIndex);
                 });
-
-                // Configurar eventos de arrastre y clic para los slides
-                $popup.find('.swiper-slide').on('mousedown', function() {
-                    isDragging = false;
-                }).on('mousemove', function() {
-                    isDragging = true;
-                }).on('mouseup', function() {
-                    isDragging = false;
-                });
-
             }
 
-        } else {
-            // Mostrar el popup existente si ya fue creado
-            $popupContainer.children('.insta-post-popup').hide();
+            // Mostrar el popup y actualizar los botones de navegación entre posts
             $popup.show();
-            // Reiniciar currentIndex para mosaicPosition si es necesario
-            if (mosaicPosition !== "null" && mosaicPosition !== "undefined") {
-                currentIndex = parseInt(mosaicPosition);
-                if (isNaN(currentIndex)) {
-                    currentIndex = 0;
-                } else {
-                    currentIndex = currentIndex % 3;
-                }
-            } else {
-                currentIndex = 0; // Inicializar currentIndex a 0 si no es mosaic
-            }
-
-            // Mostrar el medio inicial y actualizar los botones de navegación
+            $popupContainer.show();
+            isPopupVisible = true;
+            updatePostNavButtons();
+        } else {
+            // Mostrar el popup existente y actualizar los botones de navegación entre posts
+            $popup.show();
+            $popupContainer.show();
+            isPopupVisible = true;
             showMedia(currentIndex);
-
-            // Reinicializar Swiper si es Mosaic
-            if (isMosaic && swipers[postId]) {
-                swipers[postId].slideTo(currentIndex, 0, false);
-                swipers[postId].update();
-            }
-        }
-
-        // Ocultar todos los popups excepto el que se acaba de abrir
-        $popupContainer.children('.insta-post-popup').not($popup).hide();
-
-        // Mostrar el contenedor del popup
-        $popupContainer.show();
-        isPopupVisible = true;
-
-        // Configurar el evento click fuera del popup para cerrarlo
-        $popupContainer.off('click').on('click', function(e) {
-            if (isPopupVisible && !isDragging && !$(e.target).closest('.insta-post-popup').length && !$(e.target).closest('.nav-btn').length) {
-                $popup.hide();
-                $popupContainer.hide();
-                isPopupVisible = false;
-                isDragging = false;
-            }
-        });
-
-
-        if (window.innerWidth >= 768) {
-            // Actualizar los botones de navegación entre posts
             updatePostNavButtons();
         }
     });
