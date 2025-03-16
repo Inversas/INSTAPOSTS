@@ -11,6 +11,8 @@ jQuery(document).ready(function($) {
     // Variable para almacenar el índice actual de la imagen
     let currentIndex = 0;
 
+    
+
     // Configurar el evento dragstart para detectar cuando se empieza a arrastrar un elemento
     $(document).on('dragstart', function() {
         isDragging = true;
@@ -242,19 +244,64 @@ jQuery(document).ready(function($) {
                     currentIndex = (currentIndex < media.length - 1) ? currentIndex + 1 : 0;
                     showMedia(currentIndex);
                 });
+
+                // Configurar eventos de arrastre y clic para los slides
+                $popup.find('.swiper-slide').on('mousedown', function() {
+                    isDragging = false;
+                }).on('mousemove', function() {
+                    isDragging = true;
+                }).on('mouseup', function() {
+                    isDragging = false;
+                });
+
             }
 
-            // Mostrar el popup y actualizar los botones de navegación entre posts
-            $popup.show();
-            $popupContainer.show();
-            isPopupVisible = true;
-            updatePostNavButtons();
         } else {
-            // Mostrar el popup existente y actualizar los botones de navegación entre posts
+            // Mostrar el popup existente si ya fue creado
+            $popupContainer.children('.insta-post-popup').hide();
             $popup.show();
-            $popupContainer.show();
-            isPopupVisible = true;
+            // Reiniciar currentIndex para mosaicPosition si es necesario
+            if (mosaicPosition !== "null" && mosaicPosition !== "undefined") {
+                currentIndex = parseInt(mosaicPosition);
+                if (isNaN(currentIndex)) {
+                    currentIndex = 0;
+                } else {
+                    currentIndex = currentIndex % 3;
+                }
+            } else {
+                currentIndex = 0; // Inicializar currentIndex a 0 si no es mosaic
+            }
+
+            // Mostrar el medio inicial y actualizar los botones de navegación
             showMedia(currentIndex);
+
+            // Reinicializar Swiper si es Mosaic
+            if (isMosaic && swipers[postId]) {
+                swipers[postId].slideTo(currentIndex, 0, false);
+                swipers[postId].update();
+            }
+        }
+
+        // Ocultar todos los popups excepto el que se acaba de abrir
+        $popupContainer.children('.insta-post-popup').not($popup).hide();
+
+        // Mostrar el contenedor del popup
+        $popupContainer.show();
+        isPopupVisible = true;
+
+        // Configurar el evento click fuera del popup para cerrarlo
+        $popupContainer.off('click').on('click', function(e) {
+            if (isPopupVisible && !isDragging && !$(e.target).closest('.insta-post-popup').length && !$(e.target).closest('.nav-btn').length) {
+                $popup.hide();
+                $popupContainer.hide();
+                isPopupVisible = false;
+                isDragging = false;
+            }
+        });
+
+
+        if (window.innerWidth >= 768) {
+            // Actualizar los botones de navegación entre posts
             updatePostNavButtons();
         }
     });
