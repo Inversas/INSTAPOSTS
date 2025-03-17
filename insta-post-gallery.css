@@ -33,9 +33,9 @@
     box-sizing: border-box;
     position: relative; /* Necesario para el pseudo-elemento */
     padding-top: 100%; /* Relación de aspecto 1:1 para hacer el contenedor cuadrado */
-    width: calc(100% - 5px); /* Ajustar el ancho para incluir el espacio */
+    width: calc(100% - 4px); /* Ajustar el ancho para incluir el espacio */
     box-sizing: border-box;
-    margin: 2.5px; /* Espaciado equivalente al gap */
+    margin: 2px; /* Espaciado equivalente al gap */
 }
 
 .insta-post-item img {
@@ -47,6 +47,11 @@
     object-fit: cover;
 }
 
+.mosaic {
+  width: calc(100% - 0px);
+  margin-top:0;
+  margin-bottom:0;
+}
 .insta-post-popup-container {
     position: fixed;
     top: 0;
@@ -204,8 +209,8 @@
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: #fafafa; /* Fondo gris claro */
-    color: #000; /* Letras negras */
+    background: #848484;
+    color: #fff;
     padding: 10px;
     cursor: pointer;
     border-radius: 50%;
