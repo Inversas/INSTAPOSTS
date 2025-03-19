@@ -88,22 +88,33 @@ jQuery(document).ready(function($) {
 
             // Configurar el evento click para el botón de navegación entre posts anterior
             $popupContainer.find('.prev-post').on('click', function() {
+              if (currentVideo) {
+                  stopVideo(currentVideo);
+                  currentVideo = null;
+              }
+
                 const currentPopup = $popupContainer.find('.insta-post-popup:visible');
                 const currentPostId = currentPopup.attr('id').replace('insta-post-popup-', '');
                 const prevPostLink = $('.insta-post-link').eq($('.insta-post-link').index($(`.insta-post-link[data-post-id="${currentPostId}"]`)) - 1);
                 if (prevPostLink.length) {
                     prevPostLink.click();
                 }
+
             });
 
             // Configurar el evento click para el botón de navegación entre posts siguiente
             $popupContainer.find('.next-post').on('click', function() {
+              if (currentVideo) {
+                  stopVideo(currentVideo);
+                  currentVideo = null;
+              }
                 const currentPopup = $popupContainer.find('.insta-post-popup:visible');
                 const currentPostId = currentPopup.attr('id').replace('insta-post-popup-', '');
                 const nextPostLink = $('.insta-post-link').eq($('.insta-post-link').index($(`.insta-post-link[data-post-id="${currentPostId}"]`)) + 1);
                 if (nextPostLink.length) {
                     nextPostLink.click();
                 }
+
             });
         }
 
@@ -173,7 +184,7 @@ jQuery(document).ready(function($) {
                                     ${media.map(url => {
                                         const isVideo = url.match(/\.(mp4|webm)$/);
                                         return `<div class="swiper-slide">
-                                                    ${isVideo ? `<video src="${url}" alt="media" style="max-width:100%;" class="media-preview" autoplay loop></video>`
+                                                    ${isVideo ? `<video src="${url}" alt="media" style="max-width:100%;" class="media-preview" loop></video>`
                                                               : `<img src="${url}" alt="media" style="max-width:100%;" class="media-preview" />`}
                                                 </div>`;
                                     }).join('')}
@@ -234,7 +245,7 @@ jQuery(document).ready(function($) {
                     const isVideo = url.match(/\.(mp4|webm)$/);
                     let mediaElement;
                     if (isVideo) {
-                        mediaElement = $('<div class="popup-content"><video src="'+url+'" style="max-width:100%;" class="media-preview" autoplay loop></video></div>');
+                        mediaElement = $('<div class="popup-content"><video src="'+url+'" style="max-width:100%;" class="media-preview" loop></video></div>');
                     } else {
                         mediaElement = $('<div class="popup-content"><img src="'+url+'" style="max-width:100%;" class="media-preview" /></div>');
                     }
