@@ -47,11 +47,12 @@
     object-fit: cover;
 }
 
-.mosaic {
-  width: calc(100% - 0px);
-  margin-top:0;
-  margin-bottom:0;
-}
+.mosaic-0, .mosaic-1, .mosaic-2 {
+    width: calc(100% - 0px);
+    margin-top:0;
+    margin-bottom:0;
+  }
+
 .insta-post-popup-container {
     position: fixed;
     top: 0;

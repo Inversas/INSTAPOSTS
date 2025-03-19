@@ -945,7 +945,7 @@ function save_insta_post_media($post_id) {
 add_action('save_post', 'save_insta_post_media');
 
 // 3. Crear el shortcode para mostrar los posts
-function insta_post_shortcode() {
+/*function insta_post_shortcode() {
     $query = new WP_Query(array(
         'post_type' => 'insta_post',
         'posts_per_page' => -1,
@@ -976,6 +976,52 @@ function insta_post_shortcode() {
             $first_media_url = isset($media[$mosaic_image_index]) ? $media[$mosaic_image_index] : '';
             $output .= '<div class="insta-post-item '.($mosaic_position !== null ? 'mosaic-'.$mosaic_position : '').$mosaic_class.'">';
             $output .= '<a href="'.esc_url($first_media_url).'" class="insta-post-link" data-media="'.esc_attr(json_encode($media)).'" data-content="'.get_the_content().'" data-post-id="'.get_the_ID().'">';
+            // Mostrar la miniatura si el primer media es un video
+            if (preg_match('/\.(mp4|webm)$/i', $first_media_url) && $thumb) {
+                $output .= '<img src="'.esc_url($thumb).'" alt="'.get_the_title().'"/>';
+            } else {
+                $output .= '<img src="'.esc_url($first_media_url).'" alt="'.get_the_title().'"/>';
+            }
+            $output .= '</a>';
+            $output .= '</div>';
+        }
+        $output .= '</div>';
+        wp_reset_postdata();
+        return $output;
+    } else {
+        return '<p>No InstaPosts found</p>';
+    }
+}*/
+// 3. Crear el shortcode para mostrar los posts
+function insta_post_shortcode() {
+    $query = new WP_Query(array(
+        'post_type' => 'insta_post',
+        'posts_per_page' => -1,
+        'order' => 'DESC',
+    ));
+    if ($query->have_posts()) {
+        $output = '<div class="insta-post-feed">';
+        $mosaic_count = 0;
+        while ($query->have_posts()) {
+            $query->the_post();
+            $media = get_post_meta(get_the_ID(), '_insta_post_media', true);
+            $thumb = get_post_meta(get_the_ID(), '_insta_post_thumb', true); // Obtener la miniatura
+            $categories = wp_get_post_terms(get_the_ID(), 'insta_post_category', array('fields' => 'slugs'));
+
+            if (in_array('mosaic', $categories)) {
+                // Manejar posts Mosaic
+                $mosaic_position = $mosaic_count % 3;
+                $mosaic_image_index = ($mosaic_position == 0) ? 0 : ($mosaic_position == 1 ? 1 : 2);
+                $mosaic_count++;
+            } else {
+                // Manejar posts no Mosaic
+                $mosaic_position = null;
+                $mosaic_image_index = 0;
+            }
+
+            $first_media_url = isset($media[$mosaic_image_index]) ? $media[$mosaic_image_index] : '';
+            $output .= '<div class="insta-post-item '.($mosaic_position !== null ? 'mosaic-'.$mosaic_position : '').'">';
+            $output .= '<a href="'.esc_url($first_media_url).'" class="insta-post-link" data-media="'.esc_attr(json_encode($media)).'" data-content="'.get_the_content().'" data-post-id="'.get_the_ID().'" data-mosaic-position="'.$mosaic_position.'" data-is-mosaic="'.($mosaic_position !== null ? 'true' : 'false').'">';
             // Mostrar la miniatura si el primer media es un video
             if (preg_match('/\.(mp4|webm)$/i', $first_media_url) && $thumb) {
                 $output .= '<img src="'.esc_url($thumb).'" alt="'.get_the_title().'"/>';
